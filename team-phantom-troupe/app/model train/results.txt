@@ -1,0 +1,22 @@
+--- Model Evaluation ---
+Accuracy: 100.00%
+
+Confusion Matrix:
+[[10  0]
+ [ 0  3]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+        SAFE       1.00      1.00      1.00        10
+  OVERFISHED       1.00      1.00      1.00         3
+
+    accuracy                           1.00        13
+   macro avg       1.00      1.00      1.00        13
+weighted avg       1.00      1.00      1.00        13
+
+
+--- Sample Predictions ---
+Input 1 [28, 0.7, 20, 1] -> Result: SAFE
+Input 2 [29, 0.6, 60, 1] -> Result: OVERFISHED
+Input 3 [30, 0.3, 50, 0] -> Result: SAFE

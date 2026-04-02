@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeaGuard | Automated Fishing Predictor</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --accent-blue: #38bdf8;
+            --safe-color: #22c55e;
+            --danger-color: #ef4444;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            height: 100%;
+            overflow: hidden;
+            background: var(--primary-bg);
+            color: var(--text-main);
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            width: 300px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin: 0 0 16px 0;
+            font-weight: 600;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            opacity: 0.8;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .btn-location {
+            background: var(--accent-blue);
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .btn-location:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        .info-tab {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            opacity: 0.7;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .prediction-summary {
+            font-family: inherit;
+            padding: 10px;
+            min-width: 200px;
+        }
+
+        .pfz-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        /* Leaflet popup styling */
+        .leaflet-popup-content-wrapper {
+            background: var(--primary-bg);
+            color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .leaflet-popup-tip {
+            background: var(--primary-bg);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h1>🛳 SeaGuard AI</h1>
+        <div class="input-group">
+            <label>Sea Temp (SST) °C</label>
+            <input type="number" id="sst" value="28.5" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>Chlorophyll (mg/m³)</label>
+            <input type="number" id="chlorophyll" value="0.75" step="0.01">
+        </div>
+        <div class="input-group">
+            <label>Boats in Vicinity</label>
+            <input type="number" id="boats" value="30">
+        </div>
+        
+        <!-- PFZ is now AUTOMATED in the backend! -->
+        
+        <button class="btn-location" onclick="getLocation()">📍 My Live Location</button>
+
+        <div class="info-tab">
+            PFZ is now <strong>automatically determined</strong> based on your coordinate location click. 
+            Click anywhere on the map to begin.
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        // Start Map (Centered on India coastal area)
+        const map = L.map('map').setView([15.0, 75.0], 5);
+
+        // Add Premium Dark Layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Handling Map Interaction
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            getAutomationPrediction(lat, lon);
+        });
+
+        // Backend Prediction Fetch
+        async function getAutomationPrediction(lat, lon) {
+            const sst = document.getElementById('sst').value;
+            const chlorophyll = document.getElementById('chlorophyll').value;
+            const boats = document.getElementById('boats').value;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lat, lon, sst, chlorophyll, boats })
+                    // PFZ is determined in backend based on nearest location data point
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const markerColor = data.result === 'SAFE' ? '#22c55e' : '#ef4444';
+                    
+                    const marker = L.circleMarker([lat, lon], {
+                        radius: 8,
+                        fillColor: markerColor,
+                        color: "#fff",
+                        weight: 1.5,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map);
+
+                    // Dynamic Popup Contents
+                    const popupHTML = `
+                        <div class="prediction-summary">
+                            <strong style="color: ${markerColor}; font-size: 1.1rem;">${data.result}</strong><br>
+                            <div style="margin-top: 8px;">
+                                <span class="pfz-badge">Identified PFZ: ${data.pfz_used}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 10px;">
+                                ${data.reason}<br>
+                                <hr style="border: 0.5px solid rgba(255,255,255,0.1); margin: 8px 0;">
+                                Coordinates: ${lat.toFixed(4)}, ${lon.toFixed(4)}
+                            </div>
+                        </div>
+                    `;
+
+                    marker.bindPopup(popupHTML).openPopup();
+                }
+            } catch (error) {
+                console.error("Prediction Error:", error);
+                alert("The SeaGuard server is unreachable at the moment.");
+            }
+        }
+
+        // Live Geolocation Handling
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    map.setView([lat, lon], 12);
+                    L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
+                    
+                    // Automatically trigger prediction on your live location
+                    getAutomationPrediction(lat, lon);
+                }, (err) => {
+                    alert("GPS access denied or unavailable.");
+                });
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Environment variables (SECRETS - never push!)
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pkl
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
