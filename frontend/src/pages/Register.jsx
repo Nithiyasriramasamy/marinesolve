@@ -49,17 +49,17 @@ const Register = ({ setAuthData }) => {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 15 }}>
               <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: '#94a3b8' }}>Full Name *</label>
-              <input type="text" name="name" className="input-field" value={formData.name} onChange={handleChange} placeholder="e.g. Nithiya" required={{ width: '100%', padding: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }} />
+              <input type="text" name="name" className="input-field" value={formData.name} onChange={handleChange} placeholder="e.g. Nithiya" required={{ width: '100%', padding: '20px', background: 'rgba(255, 255, 255, 0.05)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }} />
             </div>
 
             <div style={{ marginBottom: 15 }}>
               <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: '#94a3b8' }}>Age *</label>
-              <input type="number" name="age" className="input-field" value={formData.age} onChange={handleChange} placeholder="e.g. 25" required={{ width: '100%', padding: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }} />
+              <input type="number" name="age" className="input-field" value={formData.age} onChange={handleChange} placeholder="e.g. 25" required={{ width: '100%', padding: '20px', background: 'rgba(255, 255, 255, 0.05)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }} />
             </div>
 
             <div style={{ marginBottom: 15 }}>
               <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: '#94a3b8' }}>Location (Port/City) *</label>
-              <input type="text" name="location" list="locations" className="input-field" value={formData.location} onChange={handleChange} placeholder="Start typing..." required={{ width: '100%', padding: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }} />
+              <input type="text" name="location" list="locations" className="input-field" value={formData.location} onChange={handleChange} placeholder="Start typing..." required={{ width: '100%', padding: '20px', background: 'rgba(255, 255, 255, 0.05)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px' }} />
               <datalist id="locations">
                 <option value="Karwar" />
                 <option value="Mangalore" />
