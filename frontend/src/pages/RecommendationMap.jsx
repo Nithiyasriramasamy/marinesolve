@@ -89,7 +89,7 @@ const RecommendationMap = ({ userData, authData, recommendations, setRecommendat
         // Load initial large map data asynchronously for fast toggle access
         const fetchHeatmap = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5001/heatmap');
+                const response = await axios.get('https://marinesolve-1.onrender.com/heatmap');
                 setHeatmapData(response.data.heatmap_points);
             } catch(e) {
                 console.error("Heatmap load error:", e);
@@ -99,7 +99,7 @@ const RecommendationMap = ({ userData, authData, recommendations, setRecommendat
         
         const fetchRecommendations = async () => {
             try {
-                const response = await axios.post('http://127.0.0.1:5001/recommend', {
+                const response = await axios.post('https://marinesolve-1.onrender.com/recommend', {
                     lat: userData.location.lat,
                     lon: userData.location.lon,
                     boat_type: userData.boat_type,
